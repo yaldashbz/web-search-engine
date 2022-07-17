@@ -30,7 +30,7 @@ class FasttextRepresentation(BaseRepresentation):
         self.mkdir(root)
         self.mkdir(os.path.join(root, folder))
 
-        model_file = os.path.join(root, self._MODEL_FILE)
+        model_file = os.path.join(root, folder, self._MODEL_FILE)
         if not (train or os.path.exists(model_file)):
             raise ValueError
 

@@ -6,3 +6,4 @@ venv
 clean_data.json
 matrices
 models
+bert

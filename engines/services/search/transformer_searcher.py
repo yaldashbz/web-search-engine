@@ -21,9 +21,10 @@ class TransformerSearcher(BaseSearcher):
         )
         self.index = self._get_index(self.representation.embeddings)
 
-    def _get_index(self, embeddings):
+    @classmethod
+    def _get_index(cls, embeddings):
         index = faiss.IndexIDMap(faiss.IndexFlatL2(embeddings.shape[1]))
-        index.add_with_ids(embeddings, np.array(range(len(self.data))))
+        index.add_with_ids(embeddings, np.array(range(len(embeddings))).astype('int64'))
         return index
 
     def search(self, query, k: int = 10) -> Optional[DataOut]:

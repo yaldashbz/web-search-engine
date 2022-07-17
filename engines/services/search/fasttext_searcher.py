@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 
 from engines.services.data_collection.utils import TOKENS_KEY
 from engines.services.representation import FasttextRepresentation

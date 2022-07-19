@@ -11,6 +11,7 @@ from sentence_transformers import SentenceTransformer
 from engines.services.data_collection.utils import get_contents, TOKENS_KEY
 from engines.services.preprocess import PreProcessor
 from engines.services.representation.base import BaseRepresentation
+from engines.services.utils import check_mkdir
 
 
 class BertRepresentation(BaseRepresentation):
@@ -21,21 +22,24 @@ class BertRepresentation(BaseRepresentation):
             self, data,
             load: bool = False,
             tokens_key: str = TOKENS_KEY,
-            root: str = 'bert'
+            root: str = 'models',
+            folder: str = 'bert'
     ):
         super().__init__(data, tokens_key)
-        if load and not os.path.exists(os.path.join(root, self._FILE)):
+        if load and not os.path.exists(os.path.join(root, folder, self._FILE)):
             raise ValueError
-        self.mkdir(root)
-        self.model = self._get_model(load, os.path.join(root, self._MODEL))
+        check_mkdir(root)
+        path = os.path.join(root, folder)
+        check_mkdir(path)
+        self.model = self._get_model(load, os.path.join(path, self._MODEL))
         self._to_cuda()
 
         if not load and data:
             contents = self.prepare_data()
             self.df = self._get_embeddings(contents)
-            self._save_embeddings(root)
+            self._save_embeddings(path)
         else:
-            self.df = self._load_embeddings(root)
+            self.df = self._load_embeddings(path)
         self.embeddings = np.asarray(self.df.values.tolist()).astype('float32')
 
     @classmethod
@@ -47,11 +51,11 @@ class BertRepresentation(BaseRepresentation):
         else:
             return pickle.load(open(model_path, 'rb'))
 
-    def _load_embeddings(self, root):
-        return pd.read_json(os.path.join(root, self._FILE))
+    def _load_embeddings(self, path):
+        return pd.read_json(os.path.join(path, self._FILE))
 
-    def _save_embeddings(self, root):
-        self.df.to_json(os.path.join(root, self._FILE))
+    def _save_embeddings(self, path):
+        self.df.to_json(os.path.join(path, self._FILE))
 
     def prepare_data(self) -> List:
         return get_contents(self.data, key=self.tokens_key)

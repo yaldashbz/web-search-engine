@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 import matplotlib.cm as cm
@@ -60,3 +61,8 @@ def get_docs_with_urls(data, urls):
 
 def count_same_words(first: List[str], second: List[str]):
     return len(set(first).intersection(set(second)))
+
+
+def check_mkdir(path: str):
+    if not os.path.exists(path):
+        os.mkdir(path)

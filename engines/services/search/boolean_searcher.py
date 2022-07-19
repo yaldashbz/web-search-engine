@@ -10,6 +10,7 @@ import numpy as np
 from engines.services.data_collection.utils import TOKENS_KEY
 from engines.services.search.base import BaseSearcher
 from engines.services.search.utils import create_boolean_matrix, DataOut
+from engines.services.utils import check_mkdir
 
 NOT = 'not'
 AND = 'and'
@@ -34,7 +35,7 @@ class BooleanSearcher(BaseSearcher):
         if not (build or os.path.exists(matrix_path) or os.path.exists(header_path)):
             raise ValueError
 
-        self.mkdir(path=root)
+        check_mkdir(path=root)
         self.matrix, self.header = self._get_matrix(build, matrix_path, header_path)
 
     def _get_matrix(self, build, matrix_path, header_path):

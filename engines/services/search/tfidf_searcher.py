@@ -10,9 +10,14 @@ from engines.services.utils import cosine_sim
 
 
 class TFIDFSearcher(BaseSearcher):
-    def __init__(self, data, tokens_key: str = TOKENS_KEY):
+    def __init__(
+            self, data,
+            tokens_key: str = TOKENS_KEY,
+            representation: Optional[TFIDFRepresentation] = None
+    ):
         super().__init__(data, tokens_key)
-        self.representation = TFIDFRepresentation(data, tokens_key=tokens_key)
+        self.representation = TFIDFRepresentation(data, tokens_key=tokens_key) \
+            if not representation else representation
 
     def search(self, query, k: int = 10) -> Optional[DataOut]:
         scores = list()

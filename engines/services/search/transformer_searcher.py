@@ -13,12 +13,13 @@ class TransformerSearcher(BaseSearcher):
     def __init__(
             self, data,
             load: bool = False,
-            tokens_key: str = TOKENS_KEY
+            tokens_key: str = TOKENS_KEY,
+            representation: Optional[BertRepresentation] = None
     ):
         super().__init__(data, tokens_key)
         self.representation = BertRepresentation(
             data=data, load=load, tokens_key=tokens_key
-        )
+        ) if not representation else representation
         self.index = self._get_index(self.representation.embeddings)
 
     @classmethod

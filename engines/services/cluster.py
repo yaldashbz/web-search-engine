@@ -7,9 +7,13 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from yellowbrick.cluster import KElbowVisualizer
 
-from data_collection.utils import get_content
-from methods.representation import TFIDFRepresentation, BertRepresentation, FasttextRepresentation
-from methods.utils import plot_silhouette
+from engines.services.data_collection.utils import get_content
+from engines.services.representation import (
+    TFIDFRepresentation,
+    BertRepresentation,
+    FasttextRepresentation, BaseRepresentation
+)
+from engines.services.utils import plot_silhouette, check_mkdir
 
 _representations = {
     'tf-idf': TFIDFRepresentation,
@@ -19,37 +23,41 @@ _representations = {
 
 
 class ContentKMeanCluster:
-    _PATH = '../models/kmeans'
     _MODEL = 'kmeans.pkl'
-    _RESULT = 'result.json'
+    _RESULT = 'kmeans_result.json'
 
     def __init__(
-            self, data=None,
+            self, data,
             load_cluster: bool = False,
             method: str = 'tf-idf',
+            representation: BaseRepresentation = None,
+            cluster_root: str = 'models',
+            cluster_folder: str = 'kmeans',
             **repr_kwargs
     ):
-        assert data or load_cluster
-
+        check_mkdir(cluster_root)
+        self.path = os.path.join(cluster_root, cluster_folder)
+        check_mkdir(self.path)
         self.data = data
-        self.representation = _representations[method](data=data, **repr_kwargs)
+        self.representation = _representations[method](data=data, **repr_kwargs) if \
+            not representation else representation
         self.represented_df = self.representation.represent()
         self.k_means = None if not load_cluster else self.load_model(self.model_path)
         self.result_df = None if not load_cluster else self.load_result(self.result_path)
 
     @property
     def model_path(self):
-        return os.path.join(self._PATH, self._MODEL)
+        return os.path.join(self.path, self._MODEL)
 
     @property
     def result_path(self):
-        return os.path.join(self._PATH, self._RESULT)
+        return os.path.join(self.path, self._RESULT)
 
     def run(self, k: int = 2, save: bool = True):
         self.k_means = KMeans(
             n_clusters=k,
             random_state=1
-        ).fit(self.represented_df)
+        ).fit(self.represented_df.astype('double'))
         if save:
             self.save_model(self.model_path)
         return self.k_means
@@ -101,7 +109,7 @@ class ContentKMeanCluster:
 
     def silhouette_evaluate(self, plot: bool = False):
         k = self.k_means.n_clusters
-        df = self.represented_df.to_numpy()
+        df = self.represented_df.to_numpy().astype('double')
         labels = self.k_means.predict(df)
         score = silhouette_score(df, labels)
         if plot:

@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 from engines.services.data_collection.utils import get_doc_words, TOKENS_KEY
 from engines.services.representation import BaseRepresentation, PreProcessor
+from engines.services.utils import check_mkdir
 
 
 class FasttextRepresentation(BaseRepresentation):
@@ -27,8 +28,8 @@ class FasttextRepresentation(BaseRepresentation):
         assert load != train
 
         super().__init__(data, tokens_key)
-        self.mkdir(root)
-        self.mkdir(os.path.join(root, folder))
+        check_mkdir(root)
+        check_mkdir(os.path.join(root, folder))
 
         model_file = os.path.join(root, folder, self._MODEL_FILE)
         if not (train or os.path.exists(model_file)):

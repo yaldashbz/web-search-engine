@@ -11,8 +11,9 @@ import os
 
 from django.core.asgi import get_asgi_application
 
+from engines.services.cluster import ContentKMeanCluster
 from engines.services.search import (
-    BooleanSearcher, TFIDFSearcher, TransformerSearcher, FasttextSearcher
+    BooleanSearcher, TFIDFSearcher, TransformerSearcher, FasttextSearcher, FasttextRepresentation
 )
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebSearchEngine.settings')
@@ -20,11 +21,20 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebSearchEngine.settings')
 application = get_asgi_application()
 
 clean_path = 'clean_data.json'
-tokens_key = 'cleaned_tokens'
 data = json.load(open(clean_path, 'r'))
-tfidf_searcher = TFIDFSearcher(data=data, tokens_key=tokens_key)
-boolean_searcher = BooleanSearcher(data=data, build=False, tokens_key=tokens_key)
-bert_searcher = TransformerSearcher(data=data, load=True, tokens_key=tokens_key)
+_args = dict(
+    tokens_key='cleaned_tokens',
+    data=data
+)
+tfidf_searcher = TFIDFSearcher(**_args)
+boolean_searcher = BooleanSearcher(build=False, **_args)
+bert_searcher = TransformerSearcher(load=True, **_args)
+fasttext_repr = FasttextRepresentation(
+    train=False, load=True, min_count=4, **_args
+)
 fasttext_searcher = FasttextSearcher(
-    data=data, train=False, load=True, min_count=4, tokens_key=tokens_key
+    data=data, representation=fasttext_repr
+)
+fasttext_cluster = ContentKMeanCluster(
+    data=data, load_cluster=True, representation=fasttext_repr
 )

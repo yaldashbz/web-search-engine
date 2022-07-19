@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.viewsets import GenericViewSet
 
-from engines.services.search.general import search
+from engines.services.general import search
 
 
 class SearchViewSet(GenericViewSet):
@@ -13,8 +13,8 @@ class SearchViewSet(GenericViewSet):
     @action(methods=['GET'], detail=False)
     def search(self, request, method):
         query = request.query_params.get('query')
-        result = search(query, method, k=10)
         if query:
+            result = search(query, method, k=10)
             return Response(data={
                 'result': result
             }, status=HTTP_200_OK)

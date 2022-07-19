@@ -19,8 +19,3 @@ class BaseSearcher(ABC):
     @abstractmethod
     def search(self, query, k: int = 10) -> Optional[DataOut]:
         pass
-
-    @classmethod
-    def mkdir(cls, path):
-        if not os.path.exists(path):
-            os.mkdir(path)

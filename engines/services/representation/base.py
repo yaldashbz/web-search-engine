@@ -25,8 +25,3 @@ class BaseRepresentation(ABC):
 
     def embed(self, query: str):
         raise NotImplementedError
-
-    @classmethod
-    def mkdir(cls, path):
-        if not os.path.exists(path):
-            os.mkdir(path)

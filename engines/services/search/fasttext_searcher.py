@@ -15,14 +15,15 @@ class FasttextSearcher(BaseSearcher):
             min_count: int = 1,
             tokens_key: str = TOKENS_KEY,
             root: str = 'models',
-            folder: str = 'fasttext'
+            folder: str = 'fasttext',
+            representation: Optional[FasttextRepresentation] = None
     ):
         super().__init__(data, tokens_key)
         self.representation = FasttextRepresentation(
             data, train=train, load=load,
             min_count=min_count, tokens_key=tokens_key,
             root=root, folder=folder
-        )
+        ) if not representation else representation
 
     def search(self, query, k: int = 10) -> Optional[DataOut]:
         query_embedding_avg = self.representation.embed(query)

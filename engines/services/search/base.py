@@ -1,10 +1,9 @@
-import os
 from abc import ABC, abstractmethod
 from typing import Optional
 
 from engines.services.data_collection.utils import TOKENS_KEY
-from engines.services.search.utils import DataOut
 from engines.services.preprocess import PreProcessor
+from engines.services.search.utils import DataOut
 
 
 class BaseSearcher(ABC):

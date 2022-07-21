@@ -11,9 +11,10 @@ torch==1.11.0
 fiass-cpu==1.7.2
 gensim==4.2.0
 yellowbrick==1.4
-networkx==2.8.4
+networkx==2.8.5
 transformers==4.20.1
 djangorestframework==3.13.1
 Django==4.0.6
 # torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
 environ==1.0
+elasticsearch==8.3.1

@@ -17,7 +17,7 @@ urlpatterns = [
     re_path(r'^cluster/score/(?P<method>fasttext)$', ClusterViewSet.as_view({
         'get': 'score'
     })),
-    re_path('search/(?P<method>tf-idf|bert|fasttext|boolean)', SearchViewSet.as_view({
+    re_path('search/(?P<method>tf-idf|bert|fasttext|boolean|elastic)', SearchViewSet.as_view({
         'get': 'search'
     })),
     path('search/link-analysis', SearchViewSet.as_view({

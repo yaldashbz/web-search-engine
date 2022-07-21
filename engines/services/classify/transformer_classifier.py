@@ -20,6 +20,8 @@ from engines.services.utils import WebDataset, check_mkdir
 
 class TransformerClassifier:
     _LABELS = 'tc_labels.json'
+    _MODEL_FOLDER = 'model'
+    _TOKENIZER_FOLDER = 'tokenizer'
 
     def __init__(
             self, data=None,
@@ -35,7 +37,7 @@ class TransformerClassifier:
         self.path = os.path.join(root, folder)
         check_mkdir(self.path)
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.tokenizer = self._get_tokenizer(model_name)
+        self.tokenizer = self._get_tokenizer(model_name, load)
 
         if data:
             self.X, self.y, self.label2idx = self._getXy(data, tokens_key)
@@ -59,16 +61,25 @@ class TransformerClassifier:
     def label_path(self):
         return os.path.join(self.path, self._LABELS)
 
-    @classmethod
-    def _get_tokenizer(cls, model_name):
-        return BertTokenizer.from_pretrained(model_name)
+    @property
+    def model_path(self):
+        return os.path.join(self.path, self._MODEL_FOLDER)
+
+    @property
+    def tokenizer_path(self):
+        return os.path.join(self.path, self._TOKENIZER_FOLDER)
 
     def _get_model(self, model_name, load: bool):
         return BertForSequenceClassification.from_pretrained(
             model_name, num_labels=len(self.label2idx)
         ) if not load else BertForSequenceClassification.from_pretrained(
-            self.path, local_files_only=True
+            self.model_path, local_files_only=True
         )
+
+    def _get_tokenizer(self, tokenizer_name, load: bool):
+        return BertTokenizer.from_pretrained(
+            tokenizer_name) if not load else BertTokenizer.from_pretrained(
+            self.tokenizer_path, local_files_only=True)
 
     @classmethod
     def _getXy(cls, data, tokens_key: str):
@@ -97,11 +108,11 @@ class TransformerClassifier:
         training_args = TrainingArguments(
             output_dir="./results",
             learning_rate=2e-5,
-            per_device_train_batch_size=4,
-            per_device_eval_batch_size=32,
+            per_device_train_batch_size=16,
+            per_device_eval_batch_size=16,
             num_train_epochs=10,
             weight_decay=0.01,
-            warmup_steps=600,
+            warmup_steps=500,
             logging_steps=10
         )
 
@@ -127,7 +138,8 @@ class TransformerClassifier:
         self.y_predicted = y_predicted
 
     def save(self):
-        self.model.to('cpu').save_pretrained(save_directory=self.path)
+        self.model.to('cpu').save_pretrained(save_directory=self.model_path)
+        self.tokenizer.save_pretrained(save_directory=self.tokenizer_path)
         self.model.to(self.device)
         json.dump(self.label2idx, open(self.label_path, 'w'))
 

@@ -17,6 +17,7 @@ from engines.services.cluster import ContentKMeanCluster
 from engines.services.search import (
     BooleanSearcher, TFIDFSearcher, TransformerSearcher, FasttextSearcher, FasttextRepresentation
 )
+from engines.services.search.elastic_searcher import ElasticSearcher
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebSearchEngine.settings')
 
@@ -31,6 +32,7 @@ _kwargs = dict(
 tfidf_searcher = TFIDFSearcher(**_kwargs)
 boolean_searcher = BooleanSearcher(build=False, **_kwargs)
 bert_searcher = TransformerSearcher(load=True, **_kwargs)
+elastic_searcher = ElasticSearcher(**_kwargs)
 fasttext_repr = FasttextRepresentation(
     train=False, load=True, min_count=4, **_kwargs
 )

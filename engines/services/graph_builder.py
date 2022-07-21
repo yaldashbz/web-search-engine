@@ -7,8 +7,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
 from tqdm import tqdm
 
-from data_collection.utils import get_sentences
-from methods.utils import count_same_words
+from engines.services.data_collection.utils import get_sentences
+from engines.services.utils import count_same_words
 
 
 class _BaseGraphBuilder:

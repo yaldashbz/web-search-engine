@@ -78,7 +78,7 @@ class BertRepresentation(BaseRepresentation):
             show_progress_bar=True,
             normalize_embeddings=True,
             device='cuda' if torch.cuda.is_available() else 'cpu'
-        )
+        ).reshape(-1)
 
     def _to_cuda(self):
         if torch.cuda.is_available():

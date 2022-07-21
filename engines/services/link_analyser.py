@@ -3,7 +3,7 @@ from itertools import chain
 import networkx as nx
 import numpy as np
 
-from methods.graph_builder import GraphBuilder, TFIDFGraphBuilder
+from engines.services.graph_builder import GraphBuilder, TFIDFGraphBuilder
 
 _builder = {
     'word': GraphBuilder,

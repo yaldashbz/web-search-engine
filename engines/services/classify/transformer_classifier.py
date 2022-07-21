@@ -10,27 +10,30 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from transformers import (
-    TrainingArguments, Trainer, pipeline,
+    TrainingArguments, Trainer,
     BertTokenizer, BertForSequenceClassification
 )
 
-from engines.services.data_collection.utils import OTHERS, get_content
-from engines.services.utils import WebDataset
+from engines.services.data_collection.utils import OTHERS, get_content, TOKENS_KEY
+from engines.services.utils import WebDataset, check_mkdir
 
 
 class TransformerClassifier:
-    _PATH = '../models'
-    _LABELS = 'labels.json'
+    _LABELS = 'tc_labels.json'
 
     def __init__(
-            self, data,
+            self, data=None,
             load: bool = False,
             model_name: str = 'bert-base-cased',
             valtest_size: float = 0.2,
             test_size: float = 0.5,
-            tokens_key: str = 'tokens'
+            tokens_key: str = TOKENS_KEY,
+            root: str = 'models',
+            folder: str = 'transformer_classifier'
     ):
-        assert data or load
+        check_mkdir(root)
+        self.path = os.path.join(root, folder)
+        check_mkdir(self.path)
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.tokenizer = self._get_tokenizer(model_name)
 
@@ -54,7 +57,7 @@ class TransformerClassifier:
 
     @property
     def label_path(self):
-        return os.path.join(self._PATH, self._LABELS)
+        return os.path.join(self.path, self._LABELS)
 
     @classmethod
     def _get_tokenizer(cls, model_name):
@@ -64,24 +67,19 @@ class TransformerClassifier:
         return BertForSequenceClassification.from_pretrained(
             model_name, num_labels=len(self.label2idx)
         ) if not load else BertForSequenceClassification.from_pretrained(
-            self._PATH, local_files_only=True
+            self.path, local_files_only=True
         )
 
-    def _getXy(self, data, tokens_key: str):
+    @classmethod
+    def _getXy(cls, data, tokens_key: str):
         X = [get_content(doc[tokens_key]) for doc in data]
         y = [
             doc['category'] if doc['category'] else OTHERS
             for doc in data
         ]
         label2idx = {label: i for i, label in enumerate(list(set(y)))}
-        self.save_label2idx(label2idx)
         y = [label2idx[label] for label in y]
         return X, y, label2idx
-
-    def save_label2idx(self, label2idx):
-        if not os.path.exists(self._PATH):
-            os.mkdir(self._PATH)
-        json.dump(label2idx, open(self.label_path, 'w'))
 
     def _get_encodings(self, tokenizer):
         train_encodings = tokenizer(self.X_train, truncation=True, padding=True)
@@ -99,11 +97,11 @@ class TransformerClassifier:
         training_args = TrainingArguments(
             output_dir="./results",
             learning_rate=2e-5,
-            per_device_train_batch_size=16,
-            per_device_eval_batch_size=16,
+            per_device_train_batch_size=4,
+            per_device_eval_batch_size=32,
             num_train_epochs=10,
             weight_decay=0.01,
-            warmup_steps=500,
+            warmup_steps=600,
             logging_steps=10
         )
 
@@ -115,10 +113,6 @@ class TransformerClassifier:
         )
 
         trainer.train()
-
-    def _get_generator(self):
-        return pipeline(
-            'text-classification', self.model, tokenizer=self.tokenizer)
 
     def train(self):
         self._train(*self.datasets[:2])
@@ -133,7 +127,9 @@ class TransformerClassifier:
         self.y_predicted = y_predicted
 
     def save(self):
-        self.model.save_pretrained(save_directory=self._PATH)
+        self.model.to('cpu').save_pretrained(save_directory=self.path)
+        self.model.to(self.device)
+        json.dump(self.label2idx, open(self.label_path, 'w'))
 
     def classify(self, query):
         inp = self.tokenizer(

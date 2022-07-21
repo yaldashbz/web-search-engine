@@ -30,7 +30,8 @@ class TransformerSearcher(BaseSearcher):
 
     def search(self, query, k: int = 10) -> Optional[DataOut]:
         vector = self.representation.embed(query)
-        distances, indexes = self.index.search(np.array(vector).astype('float32'), k=k)
+        distances, indexes = self.index.search(
+            np.array(vector.reshape(1, -1)).astype('float32'), k=k)
         return DataOut(self._get_results(distances, indexes))
 
     def _get_results(self, distances, indexes):

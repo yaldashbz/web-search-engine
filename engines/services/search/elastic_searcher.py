@@ -43,7 +43,6 @@ class ElasticSearcher(BaseSearcher):
             }
         }
         out = self.client.search(index=self._INDEX, body=body)
-        print(out)
         return DataOut(self._get_result(out))
 
     @classmethod

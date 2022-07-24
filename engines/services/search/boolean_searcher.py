@@ -22,13 +22,12 @@ class BooleanSearcher(BaseSearcher):
     _HEADER_NAME = 'boolean_header.json'
 
     def __init__(
-            self, data,
+            self, data, qe,
             build: bool = True,
             tokens_key: str = TOKENS_KEY,
             root: str = 'matrices'
     ):
-        super().__init__(data, tokens_key)
-
+        super().__init__(data, qe, tokens_key)
         matrix_path = os.path.join(root, self._MATRIX_NAME)
         header_path = os.path.join(root, self._HEADER_NAME)
 
@@ -93,7 +92,9 @@ class BooleanSearcher(BaseSearcher):
             i += 1
         return new_tokens
 
-    def process_query(self, query):
+    def process_query(self, query, use_qe: bool):
+        if use_qe:
+            query = self.qe.expand_query(query.lower().split())
         query = re.sub('\\W+', ' ', query).strip().lower()
         words, operators = list(), list()
         tokens = self._handle_not(query.split())
@@ -111,8 +112,8 @@ class BooleanSearcher(BaseSearcher):
 
         return words, operators
 
-    def search(self, query, k: int = 10) -> Optional[DataOut]:
-        words, operators = self.process_query(query)
+    def search(self, query, k: int = 10, use_qe: bool = False) -> Optional[DataOut]:
+        words, operators = self.process_query(query, use_qe)
         assert len(words) == len(operators) + 1
         n = len(words)
         if n == 0:

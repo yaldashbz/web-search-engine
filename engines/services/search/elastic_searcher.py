@@ -6,14 +6,18 @@ from tqdm import tqdm
 
 from WebSearchEngine.settings import CLOUD_ID, ELASTIC_USER, ELASTIC_PASSWORD
 from engines.services.data_collection.utils import get_content
-from engines.services.search import BaseSearcher, DataOut
+from engines.services.search import BaseSearcher, DataOut, FasttextQueryExpansion
 
 
 class ElasticSearcher(BaseSearcher):
     _INDEX = 'pages'
 
-    def __init__(self, data, tokens_key: str = 'tokens'):
-        super().__init__(data, tokens_key)
+    def __init__(
+            self, data,
+            qe: FasttextQueryExpansion,
+            tokens_key: str = 'tokens'
+    ):
+        super().__init__(data, qe, tokens_key)
         self.client = Elasticsearch(
             cloud_id=CLOUD_ID,
             basic_auth=(ELASTIC_USER, ELASTIC_PASSWORD)
@@ -32,7 +36,9 @@ class ElasticSearcher(BaseSearcher):
     def delete_index(self):
         self.client.indices.delete(index=self._INDEX, ignore=[400, 404])
 
-    def search(self, query, k: int = 10, _from: int = 0) -> Optional[DataOut]:
+    def search(self, query, k: int = 10, _from: int = 0, use_qe: bool = False) -> Optional[DataOut]:
+        if use_qe:
+            query = self.qe.expand_query(query.lower().split())
         body = {
             'from': 0,
             'size': k,

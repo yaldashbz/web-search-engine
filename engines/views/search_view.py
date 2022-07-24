@@ -7,14 +7,13 @@ from engines.services.general import search, link_analysis
 
 
 class SearchViewSet(GenericViewSet):
-    # authentication_classes = [JSONWebTokenAuthentication]
-    # permission_classes = [IsAuthenticated]
 
     @action(methods=['GET'], detail=False)
     def search(self, request, method):
         query = request.query_params.get('query')
+        use_qe = request.query_params.get('use_qe') == 'true'
         if query:
-            result = search(query, method, k=10)
+            result = search(query, method, k=10, use_qe=use_qe)
             return Response(data={
                 'result': result
             }, status=HTTP_200_OK)
@@ -23,7 +22,6 @@ class SearchViewSet(GenericViewSet):
     @action(methods=['GET'], detail=False, url_path='link-analysis')
     def link_analysis(self, request):
         doc_indices = list(map(int, request.GET.getlist('doc')))
-        print(doc_indices)
         if doc_indices:
             pagerank, hub, authority = link_analysis(doc_indices)
             return Response(data={

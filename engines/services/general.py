@@ -2,7 +2,7 @@ from WebSearchEngine.asgi import (
     tfidf_searcher, boolean_searcher,
     bert_searcher, fasttext_searcher,
     fasttext_cluster, naive_classifier,
-    bert_classifier, data
+    bert_classifier, data, elastic_searcher
 )
 from engines.services.link_analyser import ContentLinkAnalyser
 
@@ -10,7 +10,8 @@ _searchers = {
     'tf-idf': tfidf_searcher,
     'boolean': boolean_searcher,
     'bert': bert_searcher,
-    'fasttext': fasttext_searcher
+    'fasttext': fasttext_searcher,
+    'elastic': elastic_searcher
 }
 
 _clusters = {
@@ -23,9 +24,9 @@ _classifiers = {
 }
 
 
-def search(query: str, method: str, k: int):
+def search(query: str, method: str, k: int, use_qe: bool):
     searcher = _searchers[method]
-    return searcher.search(query, k)
+    return searcher.search(query, k, use_qe)
 
 
 def cluster(query: str, method: str, k: int):

@@ -15,7 +15,9 @@ from WebSearchEngine.settings import DEBUG
 from engines.services.classify import NaiveBayesClassifier, TransformerClassifier
 from engines.services.cluster import ContentKMeanCluster
 from engines.services.search import (
-    BooleanSearcher, TFIDFSearcher, TransformerSearcher, FasttextSearcher, FasttextRepresentation
+    BooleanSearcher, TFIDFSearcher, TransformerSearcher,
+    FasttextSearcher, FasttextRepresentation,
+    FasttextQueryExpansion
 )
 from engines.services.search.elastic_searcher import ElasticSearcher
 
@@ -29,15 +31,17 @@ _kwargs = dict(
     tokens_key='cleaned_tokens',
     data=data
 )
-tfidf_searcher = TFIDFSearcher(**_kwargs)
-boolean_searcher = BooleanSearcher(build=False, **_kwargs)
-bert_searcher = TransformerSearcher(load=True, **_kwargs)
-elastic_searcher = ElasticSearcher(**_kwargs)
 fasttext_repr = FasttextRepresentation(
     train=False, load=True, min_count=4, **_kwargs
 )
+query_expansion = FasttextQueryExpansion(data, True, fasttext_repr)
+_qe_kwargs = dict(qe=query_expansion)
+tfidf_searcher = TFIDFSearcher(**_kwargs, **_qe_kwargs)
+boolean_searcher = BooleanSearcher(build=False, **_kwargs, **_qe_kwargs)
+bert_searcher = TransformerSearcher(load=True, **_kwargs, **_qe_kwargs)
+elastic_searcher = ElasticSearcher(**_kwargs, **_qe_kwargs)
 fasttext_searcher = FasttextSearcher(
-    data=data, representation=fasttext_repr
+    data=data, representation=fasttext_repr, **_qe_kwargs
 )
 fasttext_cluster = ContentKMeanCluster(
     data=data, load_cluster=True, representation=fasttext_repr
@@ -53,11 +57,12 @@ naive_classifier = NaiveBayesClassifier(
     method='bert',
     **_bert_repr_kwargs
 )
-bert_classifier = TransformerClassifier(
-    data=data[:1000],
-    load=True,
-    tokens_key='cleaned_tokens'
-)
+bert_classifier = None
+# bert_classifier = TransformerClassifier(
+#     data=data[:1000],
+#     load=True,
+#     tokens_key='cleaned_tokens'
+# )
 
 # if DEBUG:
 #     naive_classifier.build(save=False)

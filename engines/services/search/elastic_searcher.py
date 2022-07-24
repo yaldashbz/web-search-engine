@@ -57,5 +57,5 @@ class ElasticSearcher(BaseSearcher):
         return [dict(
             index=doc['_index'],
             score=doc['_score'],
-            content=doc['_source']['sentence']
+            url=doc['_source']['url']
         ) for doc in res]

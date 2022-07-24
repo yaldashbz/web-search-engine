@@ -3,25 +3,26 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.viewsets import GenericViewSet
 
-from engines.services.general import cluster, rss, silhouette
+from engines.services.general import classify, f1_score, accuracy, confusion_matrix
 
 
-class ClusterViewSet(GenericViewSet):
+class ClassifyViewSet(GenericViewSet):
 
     @action(methods=['GET'], detail=False)
-    def cluster(self, request, method):
+    def classify(self, request, method):
         query = request.query_params.get('query')
         if query:
-            cluster_id, result = cluster(query, method, k=10)
+            label = classify(query, method)
             return Response(data={
-                'cluster_id': cluster_id,
-                'result': result
+                'label': label
             }, status=HTTP_200_OK)
         return Response(status=HTTP_200_OK)
 
+    # for test
     @action(methods=['GET'], detail=False)
     def score(self, _, method):
         return Response(data={
-            'rss': rss(method),
-            'silhouette': silhouette(method)
+            'f1_score': f1_score(method),
+            'accuracy': accuracy(method),
+            'confusion_matrix': confusion_matrix(method)
         }, status=HTTP_200_OK)

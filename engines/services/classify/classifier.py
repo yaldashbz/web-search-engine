@@ -11,7 +11,7 @@ from engines.services.data_collection.utils import OTHERS
 from engines.services.representation import (
     TFIDFRepresentation,
     BertRepresentation,
-    FasttextRepresentation
+    FasttextRepresentation, BaseRepresentation, check_mkdir
 )
 
 _representations = {
@@ -22,20 +22,23 @@ _representations = {
 
 
 class _BaseClassifier:
-    _PATH = '../models'
-
     def __init__(
             self, data=None,
             load_clf: bool = False,
             method: str = 'tf-idf',
             split_test_size: float = 0.1,
             split_random_state: float = 1,
+            classifier_root: str = 'models',
+            classifier_folder: str = 'classifiers',
+            representation: BaseRepresentation = None,
             **repr_kwargs
     ):
-        assert data or load_clf
-
-        self.representation = _representations[method](data=data, **repr_kwargs)
-        self.classifier = None if not load_clf else self.load(self.model_path)
+        check_mkdir(classifier_root)
+        self.path = os.path.join(classifier_root, classifier_folder)
+        check_mkdir(self.path)
+        self.representation = _representations[method](data=data, **repr_kwargs) \
+            if not representation else representation
+        self.classifier = None if not load_clf else self.load_model(self.model_path)
 
         if data:
             self.X, self.y = self._getXy(data)
@@ -59,10 +62,10 @@ class _BaseClassifier:
         return X, y
 
     @classmethod
-    def load(cls, path: str):
+    def load_model(cls, path: str):
         return pickle.load(open(path, 'rb'))
 
-    def save(self, path: str):
+    def save_model(self, path: str):
         pickle.dump(self.classifier, open(path, 'wb'))
 
     def f1_score(self):
@@ -90,7 +93,7 @@ class LogisticRegressionClassifier(_BaseClassifier):
 
     @property
     def model_path(self):
-        return os.path.join(self._PATH, self._FILE)
+        return os.path.join(self.path, self._FILE)
 
     def build(self, save: bool = True, random_state: float = 0):
         self.classifier = LogisticRegression(
@@ -101,7 +104,7 @@ class LogisticRegressionClassifier(_BaseClassifier):
         )
         self.y_predicted = self.classifier.predict(self.X_test)
         if save:
-            self.save(self.model_path)
+            self.save_model(self.model_path)
         return self.classifier
 
 
@@ -110,12 +113,12 @@ class NaiveBayesClassifier(_BaseClassifier):
 
     @property
     def model_path(self):
-        return os.path.join(self._PATH, self._FILE)
+        return os.path.join(self.path, self._FILE)
 
     def build(self, save: bool = True):
         self.classifier = GaussianNB()
         self.classifier.fit(self.X_train, self.y_train)
         self.y_predicted = self.classifier.predict(self.X_test)
         if save:
-            self.save(self.model_path)
+            self.save_model(self.model_path)
         return self.classifier

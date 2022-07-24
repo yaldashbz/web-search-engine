@@ -2,6 +2,7 @@ from typing import Optional
 
 from engines.services.data_collection.utils import TOKENS_KEY
 from engines.services.representation import FasttextRepresentation
+from engines.services.search import FasttextQueryExpansion
 from engines.services.search.base import BaseSearcher
 from engines.services.search.utils import DataOut
 from engines.services.utils import cosine_sim
@@ -10,22 +11,22 @@ from engines.services.utils import cosine_sim
 class FasttextSearcher(BaseSearcher):
     def __init__(
             self, data,
-            train: bool = True,
-            load: bool = False,
-            min_count: int = 1,
-            tokens_key: str = TOKENS_KEY,
-            root: str = 'models',
-            folder: str = 'fasttext',
+            qe: FasttextQueryExpansion,
+            train: bool = True, load: bool = False,
+            min_count: int = 1, tokens_key: str = TOKENS_KEY,
+            root: str = 'models', folder: str = 'fasttext',
             representation: Optional[FasttextRepresentation] = None
     ):
-        super().__init__(data, tokens_key)
+        super().__init__(data, qe, tokens_key)
         self.representation = FasttextRepresentation(
             data, train=train, load=load,
             min_count=min_count, tokens_key=tokens_key,
             root=root, folder=folder
         ) if not representation else representation
 
-    def search(self, query, k: int = 10) -> Optional[DataOut]:
+    def search(self, query, k: int = 10, use_qe: bool = False) -> Optional[DataOut]:
+        if use_qe:
+            query = self.qe.expand_query(query.lower().split())
         query_embedding_avg = self.representation.embed(query)
         similarities = self._get_similarities(query_embedding_avg, k)
         return DataOut(self._get_result(similarities))

@@ -34,7 +34,7 @@ _kwargs = dict(
 fasttext_repr = FasttextRepresentation(
     train=False, load=True, min_count=4, **_kwargs
 )
-query_expansion = FasttextQueryExpansion(data, True, fasttext_repr)
+query_expansion = FasttextQueryExpansion(data=data, load=True, representation=fasttext_repr)
 _qe_kwargs = dict(qe=query_expansion)
 tfidf_searcher = TFIDFSearcher(**_kwargs, **_qe_kwargs)
 boolean_searcher = BooleanSearcher(build=False, **_kwargs, **_qe_kwargs)
@@ -57,12 +57,11 @@ naive_classifier = NaiveBayesClassifier(
     method='bert',
     **_bert_repr_kwargs
 )
-bert_classifier = None
-# bert_classifier = TransformerClassifier(
-#     data=data[:1000],
-#     load=True,
-#     tokens_key='cleaned_tokens'
-# )
+bert_classifier = TransformerClassifier(
+    data=data[:1000],
+    load=True,
+    tokens_key='cleaned_tokens'
+)
 
 # if DEBUG:
 #     naive_classifier.build(save=False)

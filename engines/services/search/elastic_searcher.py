@@ -40,7 +40,7 @@ class ElasticSearcher(BaseSearcher):
         if use_qe:
             query = self.qe.expand_query(query.lower().split())
         body = {
-            'from': 0,
+            'from': _from,
             'size': k,
             'query': {
                 'match': {

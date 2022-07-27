@@ -36,11 +36,11 @@ class ElasticSearcher(BaseSearcher):
     def delete_index(self):
         self.client.indices.delete(index=self._INDEX, ignore=[400, 404])
 
-    def search(self, query, k: int = 10, _from: int = 0, use_qe: bool = False) -> Optional[DataOut]:
+    def search(self, query, k: int = 10, use_qe: bool = False) -> Optional[DataOut]:
         if use_qe:
             query = self.qe.expand_query(query.lower().split())
         body = {
-            'from': _from,
+            'from': 0,
             'size': k,
             'query': {
                 'match': {
@@ -48,6 +48,7 @@ class ElasticSearcher(BaseSearcher):
                 }
             }
         }
+        print(body)
         out = self.client.search(index=self._INDEX, body=body)
         return DataOut(self._get_result(out))
 

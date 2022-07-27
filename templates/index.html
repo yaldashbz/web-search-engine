@@ -1,0 +1,76 @@
+<html>
+
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+
+<div class="container-fluid header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="topnav" id="myTopnav">
+					<a href="index.html">Home</a>
+					<a href="news.html">News</a>
+					<a href="news.html">Travel</a>
+					<a href="news.html">Economy</a>
+					<a href="news.html">Sports</a>
+					<a href="news.html">Politics</a>
+					<a href="news.html">Technology</a>
+					<a href="news.html">Blog</a>
+					<a href="news.html">Literature</a>
+					<a href="contact.html">Contact</a>
+					<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+					<i class="fa fa-bars"></i>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+function myFunction() {
+  var x = document.getElementById("myTopnav");
+  if (x.className === "topnav") {
+    x.className += " responsive";
+  } else {
+    x.className = "topnav";
+  }
+}
+</script>
+
+
+<div class="container page-wrapper">
+	<div class="row">
+		<div class="col-sm">
+			<div class="section main-section">
+				<h2 class="section-title">
+					<span>{% block title %}{% endblock %}</span>
+				</h2>
+				<div class="section-body">
+                    {% block body %}
+                    {% endblock %}
+				</div>
+			</div>
+		</div>
+    	</div>
+
+	<br>
+
+<br><br>
+
+</div>
+
+<footer class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+            web search engine
+        </div>
+	</div>
+</footer>
+
+</html>

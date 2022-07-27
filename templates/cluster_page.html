@@ -1,0 +1,13 @@
+{% extends 'base_template.html' %}
+{% block title %}Search{% endblock %}
+{% block body %}
+    <form action = {% url 'cluster' %} method="GET">
+        <input type="radio" name="method" value="fasttext"> fasttext <br>
+        query: <input type="text" name="query"><br>
+        <input type="submit" value="show cluster">
+    </form>
+    <form action = {% url 'score_t' %} method="GET">
+        <input type="radio" name="method" value="fasttext"> fasttext <br>
+        <input type="submit" value="show score">
+    </form>
+{% endblock %}

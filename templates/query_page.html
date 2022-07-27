@@ -1,0 +1,16 @@
+{% extends 'base_template.html' %}
+{% block title %}Search{% endblock %}
+{% block body %}
+    <form action = {% url 'search' %} method="GET">
+        <input type="radio" name="method" value="boolean">  boolean <br>
+        <input type="radio" name="method" value="tf-idf"> tf-idf <br>
+        <input type="radio" name="method" value="bert"> bert <br>
+        <input type="radio" name="method" value="fasttext"> fasttext <br>
+        <input type="radio" name="method" value="elastic"> fasttext <br>
+        query: <input type="text" name="query" >
+        <input type="submit" value="search" >
+    </form>
+    <a href={% url 'link-analysis' %}>
+        link-analysis
+    </a>
+{% endblock %}

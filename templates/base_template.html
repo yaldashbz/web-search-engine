@@ -1,0 +1,70 @@
+{% load static %}
+<html>
+
+<head>
+	<title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href={% static 'bootstrap.min.css' %}>
+    <link rel="stylesheet" type="text/css" href={% static 'style.css' %}>
+    <link rel="stylesheet" type="text/css" href={% static 'font-awesome.min.css' %}>
+</head>
+
+
+<div class="container-fluid header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="topnav" id="myTopnav">
+					<a href={% url 'search_page' %}>search</a>
+					<a href={% url 'cluster_page' %}>cluster</a>
+					<a href={% url 'classify_page' %}>classifier</a>
+					<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+					<i class="fa fa-bars"></i>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+function myFunction() {
+  var x = document.getElementById("myTopnav");
+  if (x.className === "topnav") {
+    x.className += " responsive";
+  } else {
+    x.className = "topnav";
+  }
+}
+</script>
+
+
+<div class="container page-wrapper">
+	<div class="row">
+		<div class="col-sm">
+			<div class="section main-section">
+				<h2 class="section-title">
+					<span>web search</span>
+				</h2>
+				<div class="section-body">
+                    {% block body %}
+                    {% endblock %}
+				</div>
+			</div>
+		</div>
+    	</div>
+
+	<br>
+
+<br><br>
+
+</div>
+
+<footer class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+            web search engine
+        </div>
+	</div>
+</footer>
+
+</html>

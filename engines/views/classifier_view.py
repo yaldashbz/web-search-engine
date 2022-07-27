@@ -9,7 +9,8 @@ from engines.services.general import classify, f1_score, accuracy, confusion_mat
 class ClassifyViewSet(GenericViewSet):
 
     @action(methods=['GET'], detail=False)
-    def classify(self, request, method):
+    def classify(self, request):
+        method = request.query_params.get('method')
         query = request.query_params.get('query')
         if query:
             label = classify(query, method)
@@ -20,7 +21,8 @@ class ClassifyViewSet(GenericViewSet):
 
     # for test
     @action(methods=['GET'], detail=False)
-    def score(self, _, method):
+    def score(self, request):
+        method = request.query_params.get('method')
         return Response(data={
             'f1_score': f1_score(method),
             'accuracy': accuracy(method),

@@ -1,0 +1,15 @@
+{% extends 'base_template.html' %}
+{% block title %}Search{% endblock %}
+{% block body %}
+    <form action = {% url 'classify' %} method="GET">
+        <input type="radio" name="method" value="naive"> naive <br>
+        <input type="radio" name="method" value="bert"> bert <br>
+        query: <input type="text" name="query"><br>
+        <input type="submit" value="show class">
+    </form>
+    <form action = {% url 'score_f' %} method="GET">
+        <input type="radio" name="method" value="naive"> naive <br>
+        <input type="radio" name="method" value="bert"> bert <br>
+        <input type="submit" value="show score">
+    </form>
+{% endblock %}

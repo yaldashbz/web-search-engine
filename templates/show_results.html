@@ -1,0 +1,10 @@
+{% extends 'base_template.html' %}
+{% block body %}
+    {% for record in result %}
+        <p>
+            <a href = {{ record.url }}>
+                doc num {{ record.index }} with score = {{ record.score }}
+            </a>
+        </p>
+    {% endfor %}
+{% endblock %}

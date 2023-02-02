@@ -1,7 +1,8 @@
 # Web Search Engine
-Information Retrieval Project
+## Information Retrieval Course Project
+### Sharif University of Technology
 
-## Methods
+### Methods
 This project is search on the web pages with five methods and query expansion:
 - boolean
 - TF-IDF
@@ -17,7 +18,7 @@ Also classification and clustring are available.
 you can use different embeddings for different methods.
 
 ---
-## How to Start
+### How to Start
 1. Clone the repo.
 ```
 git clone https://github.com/IR1401-Spring-Final-Projects/Web1401-10_38.git

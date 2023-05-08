@@ -2,7 +2,7 @@
 ## Information Retrieval Course Project
 ### Sharif University of Technology
 
-### Methodss
+### Methods
 This project is search on the web pages with five methods and query expansion:
 - boolean
 - TF-IDF
